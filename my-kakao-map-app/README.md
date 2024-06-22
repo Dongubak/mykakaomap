@@ -91,7 +91,7 @@ export default App;
 
 
 
-## `App.js` 전체 코드 (이거는 depreciated)
+## ~~`App.js` 전체 코드 (이거는 depreciated)~~
 ```jsx
 import React, { useEffect, useRef } from 'react';
 import './App.css';
