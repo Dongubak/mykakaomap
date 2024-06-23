@@ -1,16 +1,26 @@
 import React from 'react';
-import {Map, MapMarker} from 'react-kakao-maps-sdk';
+import { Routes, Route } from 'react-router-dom';
+import Map1 from './component/Map1';
+import Map2 from './component/Map2';
+import BasicMap from './component/BasicMap';
+import MoveMap from './component/MoveMap';
+import ChangeLevel from './component/ChangeLevel';
+import MapInfo from './component/MapInfo';
+
 
 const App = () => {
   return (
-    <Map
-      center={{ lat: 33.5563, lng: 126.79581 }}
-      style={{ width: "100%", height: "360px" }}
-    >
-      <MapMarker position={{ lat: 33.55635, lng: 126.795841 }}>
-        <div style={{color:"#000"}}>Hello World!</div>
-      </MapMarker>
-    </Map>
+    <>
+      <Routes>
+        <Route path='/map1' element={<Map1></Map1>}></Route>
+        <Route path='/map2' element={<Map2></Map2>}></Route>
+        <Route path='/basicMap' element={<BasicMap></BasicMap>}></Route>
+        <Route path='/moveMap' element={<MoveMap></MoveMap>}></Route>
+        <Route path='/changeLevel' element={<ChangeLevel></ChangeLevel>}></Route>
+        <Route path='/mapInfo' element={<MapInfo></MapInfo>}></Route>
+      </Routes>
+    </>
+    
   )
 };
 

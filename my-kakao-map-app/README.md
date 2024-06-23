@@ -8,6 +8,13 @@ brew install yarn --ignore-dependencies
 
 ### styled-components임;;
 
+### git 명령어
+https://wishlan.tistory.com/entry/Git17-스테이지에-등록한올린-파일을-취소삭제하기내리기
+https://velog.io/@delilah/GitHub-Git-명령어-모음
+
+### zsh theme
+https://github.com/romkatv/powerlevel10k
+
 
 # 6.22 react-kakao-maps-sdk
 
@@ -52,20 +59,20 @@ export default App;
 import React from 'react';
 import {Map, MapMarker} from 'react-kakao-maps-sdk';
 
-const App = () => {
-  return (
-    <Map
-      center={{ lat: 33.5563, lng: 126.79581 }}
+const Map1 = () => {
+   return(
+      <Map
+      center={{ lat: 37.0614, lng: 127.0569 }}
       style={{ width: "100%", height: "360px" }}
-    >
-      <MapMarker position={{ lat: 33.55635, lng: 126.795841 }}>
+      >
+      <MapMarker position={{ lat: 37.0614, lng: 127.0569 }}>
         <div style={{color:"#000"}}>Hello World!</div>
       </MapMarker>
     </Map>
-  )
+   )
 };
 
-export default App;
+export default Map1;
 ```
 
 ### MapMarker Component에 position에 객체 받음
@@ -87,7 +94,325 @@ export default App;
 ![alt text](image-4.png)
 
 
+## basic Map
+```javascript
+import React from 'react';
+import { Map, useKakaoLoader } from 'react-kakao-maps-sdk';
 
+
+const BasicMap = () => {
+   useKakaoLoader();
+
+   return (
+      <Map // 지도를 표시할 Container
+      id="map"
+      center={{ lat: 37.0614, lng: 127.0569 }}
+      style={{ width: "100%", height: "360px" }}
+      level={3} // 지도의 확대 레벨
+    />
+   )
+}
+
+export default BasicMap;
+```
+
+위 코드를 보면 useKakaoLoader를 사용한다.
+아마 맨 아래 바닐라 자바스크립트에서 구현시에 script를 불러올 때까지 기다리는 것을
+useKakaoLoader가 대신 해주는 것 같다.
+
+## move map
+
+원하는 곳으로 부드럽게 이동하는 것이 가능하다.
+
+```javascript
+import { useState } from "react"
+import { Map, useKakaoLoader } from "react-kakao-maps-sdk"
+
+
+const MoveMap = () => {
+  useKakaoLoader()
+
+  const [state, setState] = useState({
+    // 지도의 초기 위치
+    center: { lat: 37.0614, lng: 127.0569 },
+    // 지도 위치 변경시 panto를 이용할지에 대해서 정의
+    isPanto: false,
+  });
+  
+
+  return (
+    <>
+      <Map // 지도를 표시할 Container
+        center={state.center}
+        isPanto={state.isPanto}
+        style={{
+          // 지도의 크기
+          width: "100%",
+          height: "350px",
+        }}
+        level={3} // 지도의 확대 레벨
+      ></Map>
+      <p>
+        <button
+          onClick={() =>
+            setState({
+              center: { lat: 33.452613, lng: 126.570888 },
+              isPanto: false,
+            })
+          }
+        >
+          지도 중심좌표 이동시키기
+        </button>{" "}
+        <button
+          onClick={() =>
+            setState({
+              center: { lat: 33.45058, lng: 126.574942 },
+              isPanto: true,
+            })
+          }
+        >
+          지도 중심좌표 부드럽게 이동시키기
+        </button>
+
+        <button
+          onClick={() =>
+            setState({
+              center: { lat: 37.0614, lng: 127.0569 },
+              isPanto: true,
+            })
+          }
+        >
+          원위치
+        </button>
+      </p>
+    </>
+  )
+}
+
+export default MoveMap;
+```
+
+방식은 간단하다 useState hook으로 center의 위도와 경도를 관리하고
+버튼을 누를 때 state를 수정하는 식으로 부드러운 이동을 구현한다.
+
+```javascript
+const [state, setState] = useState({
+  // 지도의 초기 위치
+  center: { lat: 37.0614, lng: 127.0569 },
+  // 지도 위치 변경시 panto를 이용할지에 대해서 정의
+  isPanto: false,
+});
+
+...
+
+<Map // 지도를 표시할 Container
+  center={state.center}
+  isPanto={state.isPanto}
+  style={{
+    // 지도의 크기
+    width: "100%",
+    height: "350px",
+  }}
+  level={3} // 지도의 확대 레벨
+></Map>
+
+...
+
+<button
+  onClick={() =>
+    setState({
+      center: { lat: 33.45058, lng: 126.574942 },
+      isPanto: true,
+    })
+  }
+>
+  지도 중심좌표 부드럽게 이동시키기
+</button>
+```
+
+## change level(줌인 줌아웃)
+
+
+```javascript
+import { useRef, useState } from "react"
+import { Map, useKakaoLoader } from "react-kakao-maps-sdk"
+
+
+
+const ChangeLevel = () => {
+  useKakaoLoader()
+  const mapRef = useRef(null)
+  const defaultLevel = 3
+  const [level, setLevel] = useState(defaultLevel)
+
+  const handleLevel = (type) => {
+    const map = mapRef.current
+    if (!map) return
+
+    if (type === "increase") {
+      map.setLevel(map.getLevel() + 1)
+      setLevel(map.getLevel())
+    } else {
+      // type === "decrease"
+      map.setLevel(map.getLevel() - 1)
+      setLevel(map.getLevel())
+    }
+  }
+
+  return (
+    <Map // 지도를 표시할 Container
+      center={{
+        lat: 33.450701,
+        lng: 126.570667,
+      }}
+      style={{
+        // 지도의 크기
+        width: "100%",
+        height: "350px",
+      }}
+      level={defaultLevel} // 지도의 확대 레벨
+      zoomable={true}
+      ref={mapRef}
+    >
+      <p>
+        <button onClick={() => handleLevel("decrease")}>지도레벨 - 1</button>{" "}
+        <button onClick={() => handleLevel("increase")}>지도레벨 + 1</button>{" "}
+        <span id="maplevel">현재 지도 레벨은 {level} 레벨 입니다.</span>
+      </p>
+    </Map>
+  )
+}
+
+export default ChangeLevel;
+```
+
+useRef를 이용하여 맵을 참조한다.
+초기 스크립트가 다 불러와 졌을 때 초기값은 null이며 마운트가 되고
+이후에 Map을 참조하게 된다. 
+
+
+```javascript
+center={{
+  lat: 33.450701,
+  lng: 126.570667,
+}}
+style={{
+  // 지도의 크기
+  width: "100%",
+  height: "350px",
+}}
+level={defaultLevel} // 지도의 확대 레벨
+zoomable={true}
+ref={mapRef}
+```
+
+level이 상승할 수록 zoom out이 된다.
+지도의 zoom 가능 여부는 zoomable 필드가 결정한다.
+level 값은 줌 정도이며 초기값은 3이다.
+
+## 현재 지도 정보를 얻기 위해 map객체의 여러 메소드 사용하기
+```javascript
+import { useRef, useState } from "react"
+import { Map, MapTypeControl, useKakaoLoader } from "react-kakao-maps-sdk"
+
+
+const MapInfo = () => {
+  useKakaoLoader()
+  const mapRef = useRef(null)
+  const [info, setInfo] = useState("")
+
+  const getInfo = () => {
+    const map = mapRef.current
+    if (!map) return
+
+    const center = map.getCenter()
+
+    // 지도의 현재 레벨을 얻어옵니다
+    const level = map.getLevel()
+
+    // 지도타입을 얻어옵니다
+    const mapTypeId = map.getMapTypeId()
+
+    // 지도의 현재 영역을 얻어옵니다
+    const bounds = map.getBounds()
+
+    // 영역의 남서쪽 좌표를 얻어옵니다
+    const swLatLng = bounds.getSouthWest()
+
+    // 영역의 북동쪽 좌표를 얻어옵니다
+    const neLatLng = bounds.getNorthEast()
+
+    // 영역정보를 문자열로 얻어옵니다. ((남,서), (북,동)) 형식입니다
+    // const boundsStr = bounds.toString()
+
+    let message = "지도 중심좌표는 위도 " + center.getLat() + ", <br>"
+    message += "경도 " + center.getLng() + " 이고 <br>"
+    message += "지도 레벨은 " + level + " 입니다 <br> <br>"
+    message += "지도 타입은 " + mapTypeId + " 이고 <br> "
+    message +=
+      "지도의 남서쪽 좌표는 " +
+      swLatLng.getLat() +
+      ", " +
+      swLatLng.getLng() +
+      " 이고 <br>"
+    message +=
+      "북동쪽 좌표는 " +
+      neLatLng.getLat() +
+      ", " +
+      neLatLng.getLng() +
+      " 입니다"
+    setInfo(message)
+  }
+
+  return (
+    <Map // 지도를 표시할 Container
+      center={{ lat: 33.450701, lng: 126.570667 }}
+      style={{
+        // 지도의 크기
+        width: "100%",
+        height: "350px",
+      }}
+      level={3} // 지도의 확대 레벨
+      ref={mapRef}
+    >
+      <MapTypeControl position={"TOPRIGHT"} />
+      <button id="getInfoBtn" onClick={getInfo}>
+        맵정보 가져오기
+      </button>
+      <p
+        id="info"
+        dangerouslySetInnerHTML={{
+          __html: info,
+        }}
+      />
+    </Map>
+  )
+}
+
+export default MapInfo;
+```
+
+![alt text](image-5.png)
+
+```javascript
+const center = map.getCenter()
+// 지도의 현재 레벨을 얻어옵니다
+const level = map.getLevel()
+
+// 지도타입을 얻어옵니다
+const mapTypeId = map.getMapTypeId()
+
+// 지도의 현재 영역을 얻어옵니다
+const bounds = map.getBounds()
+
+// 영역의 남서쪽 좌표를 얻어옵니다
+const swLatLng = bounds.getSouthWest()
+
+// 영역의 북동쪽 좌표를 얻어옵니다
+const neLatLng = bounds.getNorthEast()
+```
+
+center의 좌표는 `map.getCenter` current level은 `map.getLevel()`로 현재 지도정보 얻을 수 있음
 
 
 
