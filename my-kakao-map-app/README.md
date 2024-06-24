@@ -75,6 +75,8 @@ const Map1 = () => {
 export default Map1;
 ```
 
+![alt text](image-6.png)
+
 ### MapMarker Component에 position에 객체 받음
 ```javascript
 {
@@ -414,6 +416,260 @@ const neLatLng = bounds.getNorthEast()
 
 center의 좌표는 `map.getCenter` current level은 `map.getLevel()`로 현재 지도정보 얻을 수 있음
 
+### 지도에 컨트롤바 추가하기
+
+```javascript
+import { useState } from "react";
+import { Map, MapTypeControl, ZoomControl, useKakaoLoader } from "react-kakao-maps-sdk"
+
+
+const AddMapControl = () => {
+  useKakaoLoader()
+  const [state, setState] = useState({
+      // 지도의 초기 위치
+      center: { lat: 37.0614, lng: 127.0569 },
+      // 지도 위치 변경시 panto를 이용할지에 대해서 정의
+      isPanto: false,
+   });
+
+  return (
+    <>
+      <Map // 지도를 표시할 Container
+        id="map"
+        center={state.center}
+        style={{
+          width: "100%",
+          height: "350px",
+        }}
+        level={3} // 지도의 확대 레벨
+      >
+        <MapTypeControl position={"TOPRIGHT"} />
+        <ZoomControl position={"RIGHT"} />
+      </Map>
+    </>
+  )
+}
+
+export default AddMapControl;
+```
+
+#### MapTypeControl바 ZoomControl바
+```javascript
+<MapTypeControl position={"TOPRIGHT"} />
+<ZoomControl position={"RIGHT"} />
+```
+
+### Map type 변경하기
+
+```javascript
+import { useState } from "react"
+import { Map, MapTypeId, useKakaoLoader } from "react-kakao-maps-sdk"
+
+
+const ChangeOverlay1 = () => {
+  useKakaoLoader()
+  const [mapTypeId, setMapTypeId] = useState(null);
+
+  return (
+    <>
+      <Map // 지도를 표시할 Container
+        id="map"
+        center={{
+          // 지도의 중심좌표
+          lat: 37.566826,
+          lng: 126.9786567,
+        }}
+        style={{
+          width: "100%",
+          height: "350px",
+        }}
+        level={5}
+      >
+        {mapTypeId && <MapTypeId type={mapTypeId} />}
+      </Map>
+      <p>
+        <button onClick={() => setMapTypeId("TRAFFIC")}>교통정보 보기</button>{" "}
+        <button onClick={() => setMapTypeId("ROADVIEW")}>
+          로드뷰 도로정보 보기
+        </button>{" "}
+        <button onClick={() => setMapTypeId("TERRAIN")}>지형정보 보기</button>{" "}
+        <button onClick={() => setMapTypeId("USE_DISTRICT")}>
+          지적편집도 보기
+        </button>
+      </p>
+    </>
+  )
+}
+
+export default ChangeOverlay1;
+```
+
+`<Map>` 컴포넌트 내부에 `<MapTypeId type={} />`으로 맵의 타입을 결정할 수 있다.
+
+지도에 교통정보를 표시하려면
+
+```javascript
+<MapTypeId type={"TRAFFIC"} />
+```
+
+지도에 로드뷰를 표시하려면
+
+```javascript
+<MapTypeId type={"ROADVIEW"} />
+```
+
+지도에 지형정보 표시하려면
+
+```javascript
+<MapTypeId type={"TERRAIN"} />
+```
+
+### 여러개 추가하기
+```javascript
+import { useState } from "react"
+import { Map, MapTypeId, useKakaoLoader } from "react-kakao-maps-sdk"
+
+const ChangeOverlay2 = () => {
+  useKakaoLoader()
+  const [overlayMapTypeId, setOverlayMapTypeId] = useState({
+    TRAFFIC: false,
+    BICYCLE: false,
+    TERRAIN: false,
+    USE_DISTRICT: false,
+  })
+
+  return (
+    <>
+      <Map // 지도를 표시할 Container
+        id="map"
+        center={{
+          // 지도의 중심좌표
+          lat: 37.57319,
+          lng: 126.96658,
+        }}
+        style={{
+          width: "100%",
+          height: "350px",
+        }}
+        level={7}
+      >
+        {overlayMapTypeId.TRAFFIC && <MapTypeId type={"TRAFFIC"} />}
+        {overlayMapTypeId.BICYCLE && <MapTypeId type={"BICYCLE"} />}
+        {overlayMapTypeId.TERRAIN && <MapTypeId type={"TERRAIN"} />}
+        {overlayMapTypeId.USE_DISTRICT && <MapTypeId type={"USE_DISTRICT"} />}
+      </Map>
+      <p>
+        <input
+          type="checkbox"
+          id="chkUseDistrict"
+          onChange={(e) =>
+            setOverlayMapTypeId((p) => ({
+              ...p,
+              USE_DISTRICT: e.target.checked,
+            }))
+          }
+        />
+        {" 지적편집도 정보 보기 "}
+        <input
+          type="checkbox"
+          id="chkTerrain"
+          onChange={(e) =>
+            setOverlayMapTypeId((p) => ({ ...p, TERRAIN: e.target.checked }))
+          }
+        />
+        {" 지형정보 보기 "}
+        <input
+          type="checkbox"
+          id="chkTraffic"
+          onChange={(e) =>
+            setOverlayMapTypeId((p) => ({ ...p, TRAFFIC: e.target.checked }))
+          }
+        />
+        {" 교통정보 보기 "}
+        <input
+          type="checkbox"
+          id="chkBicycle"
+          onChange={(e) =>
+            setOverlayMapTypeId((p) => ({
+              ...p,
+              BICYCLE: e.target.checked,
+            }))
+          }
+        />
+        {" 자전거도로 정보 보기 "}
+      </p>
+    </>
+  )
+}
+
+export default ChangeOverlay2;
+```
+
+`<Map>`컴포넌트 안에 `<MapTypeId type={""}>`을 여러개 추가하면 중첩된다.
+
+### 지도에 여러 마커가 한 화면에 나오도록 레벨을 조정하기
+```javascript
+import { Map, MapMarker, useKakaoLoader, useMap } from "react-kakao-maps-sdk";
+import { useMemo, useState, useEffect } from "react";
+
+const SetBounds = () => {
+  useKakaoLoader();
+  const [points, setPoints] = useState([
+    { lat: 33.452278, lng: 126.567803 },
+    { lat: 33.452671, lng: 126.574792 },
+    { lat: 33.451744, lng: 126.572441 },
+  ]);
+
+  return (
+    <>
+      <Map
+        id="map"
+        center={{
+          lat: 33.450701,
+          lng: 126.570667,
+        }}
+        style={{
+          width: "100%",
+          height: "350px",
+        }}
+        level={3}
+      >
+        {points.map((point) => (
+          <MapMarker
+            key={`marker__${point.lat}-${point.lng}`}
+            position={point}
+          />
+        ))}
+        <ReSetttingMapBounds points={points} />
+      </Map>
+    </>
+  );
+}
+
+const ReSetttingMapBounds = ({ points }) => {
+  const map = useMap();
+  const bounds = useMemo(() => {
+    const bounds = new window.kakao.maps.LatLngBounds();
+
+    points.forEach((point) => {
+      bounds.extend(new window.kakao.maps.LatLng(point.lat, point.lng));
+    });
+    return bounds;
+  }, [points]);
+
+  return (
+    <p>
+      <button onClick={() => map.setBounds(bounds)}>
+        지도 범위 재설정 하기
+      </button>
+    </p>
+  );
+}
+
+export default SetBounds;
+```
+
+이 부분은 뭐지;;
 
 
 ## ~~`App.js` 전체 코드 (이거는 depreciated)~~
