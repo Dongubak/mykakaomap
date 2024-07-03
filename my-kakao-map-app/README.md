@@ -671,6 +671,332 @@ export default SetBounds;
 
 이 부분은 뭐지;;
 
+### 로딩이 끝난 뒤에 화면 중앙에 마커표시등 이벤트 발생시키기
+
+```javascript
+import React, { useState } from 'react';
+import { Map, MapMarker } from 'react-kakao-maps-sdk';
+
+const AddTilesloadedEvent = () => {
+   const [position, setPosition] = useState()
+   return (
+      <>
+         <Map // 지도를 표시할 Container
+         center={{
+            // 지도의 중심좌표
+            lat: 35.94204406035107,
+            lng: 126.68093675328618,
+         }}
+         style={{
+            width: "100%",
+            height: "450px",
+         }}
+         level={3} // 지도의 확대 레벨
+         onTileLoaded={(map) => setPosition({
+            lat: map.getCenter().getLat(),
+            lng: map.getCenter().getLng(),
+         })}
+         >
+         {!!position && <MapMarker position={position} />}
+         </Map>
+
+         <h2>로딩이 끝난 뒤에 화면 중앙에 마커 표시하기</h2>
+      </>
+   )
+}
+
+export default AddTilesloadedEvent;
+```
+
+`onTileLoaded` 이벤트핸들러가 타일로드가 끝난 뒤에 이벤트를 발생시킨다.
+
+
+### 마커를 손으로 이동가능하게 하고 마커의 위도와 경도를 표현하기
+
+```javascript
+import React, { useRef, useState } from 'react';
+import { Map, MapMarker } from 'react-kakao-maps-sdk';
+
+const DraggerableMarker = () => {
+   const [pos, setPos] = useState({
+
+   });
+
+   return (
+      <>
+         <Map // 지도를 표시할 Container
+         center={{
+            // 지도의 중심좌표
+            lat: 33.450701,
+            lng: 126.570667,
+         }}
+         style={{
+            // 지도의 크기
+            width: "100%",
+            height: "450px",
+         }}
+         level={3} // 지도의 확대 레벨
+      >
+         <MapMarker // 마커를 생성합니다
+            position={{
+            // 마커가 표시될 위치입니다
+            lat: 33.450701,
+            lng: 126.570667,
+            }}
+
+            onDragEnd={(map) => {
+               setPos({
+                  ...map.getPosition()
+               })
+            }}
+
+            draggable={true} // 마커가 드래그 가능하도록 설정합니다
+         />
+
+      </Map>
+      <p>{`위도 : ${pos.La}, 경도 : ${pos.Ma}`}</p>
+      <h2>마커를 손으로 이동가능하게 함 또한 마커의 위도와 경도를 표현할 수 있음</h2>
+   </>
+     
+   )
+}
+
+export default DraggerableMarker;
+```
+
+`draggable` 필드값이 `true` 인 경우 마커가 드래그 가능하다.
+
+
+### 마커이미지 변경하기
+
+```javascript
+import React, { useState } from 'react';
+import { Map, MapMarker } from 'react-kakao-maps-sdk';
+
+const MarkerImage = () => {
+   const [pos, setPos] = useState({
+
+   });
+
+   return (
+      <>
+         <Map // 지도를 표시할 Container
+         center={{
+            // 지도의 중심좌표
+            lat: 33.450701,
+            lng: 126.570667,
+         }}
+         style={{
+            // 지도의 크기
+            width: "100%",
+            height: "450px",
+         }}
+         level={3} // 지도의 확대 레벨
+      >
+         <MapMarker // 마커를 생성합니다
+            position={{
+            // 마커가 표시될 위치입니다
+            lat: 33.450701,
+            lng: 126.570667,
+            }}
+
+            onDragEnd={(map) => {
+               setPos({
+                  ...map.getPosition()
+               })
+            }}
+
+            draggable={true} // 마커가 드래그 가능하도록 설정합니다
+
+            image={{
+               src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png", // 마커이미지의 주소입니다
+               size: {
+                 width: 64,
+                 height: 69,
+               }, // 마커이미지의 크기입니다
+               options: {
+                 offset: {
+                   x: 27,
+                   y: 69,
+                 }, // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+               },
+             }}
+         />
+
+      </Map>
+      <p>{`위도 : ${pos.La}, 경도 : ${pos.Ma}`}</p>
+      <h2>마커 이미지 바꿀 수 있음</h2>
+   </>
+     
+   )
+}
+
+export default MarkerImage;
+```
+
+```javascript
+image={{
+  src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png", // 마커이미지의 주소입니다
+  size: {
+    width: 64,
+    height: 69,
+  }, // 마커이미지의 크기입니다
+  options: {
+    offset: {
+      x: 27,
+      y: 69,
+    }, // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+  },
+}}
+```
+
+위 처럼 image 에 객체로 src, size등을 설정하여 전달한다.
+
+### 지우는게 가능한 인포윈도우 생성하기
+
+```javascript
+import React from 'react';
+import { Map, MapInfoWindow, MapMarker } from 'react-kakao-maps-sdk';
+
+const InfoWindow = () => {
+   return (
+      <>
+         <Map // 지도를 표시할 Container
+         center={{
+            // 지도의 중심좌표
+            lat: 33.450701,
+            lng: 126.570667,
+         }}
+         style={{
+            // 지도의 크기
+            width: "100%",
+            height: "450px",
+         }}
+         level={4} // 지도의 확대 레벨
+      >
+         <MapInfoWindow // 인포윈도우를 생성하고 지도에 표시합니다
+            position={{
+            // 인포윈도우가 표시될 위치입니다
+            lat: 33.450701,
+            lng: 126.570667,
+            }}
+            removable={true} // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+         >
+            {/* 인포윈도우에 표출될 내용으로 HTML 문자열이나 React Component가 가능합니다 */}
+            <div style={{ padding: "5px", color: "#000" }}>Hello World!</div>
+         </MapInfoWindow>
+      </Map>
+
+      <h2>지우는게 가능한 인포윈도우 특정 위도,경도에 생성하기</h2>
+   </>
+     
+   )
+}
+
+export default InfoWindow;
+```
+
+`MapInfoWindow` 컴포넌트를 통해서 인포윈도우를 생성할 수 있으며 `div`, `React Component`가 올수 있다. `removable` 필드값을 `true`로 하면 삭제가 가능하다.
+
+
+### 마커에 인포윈도우 생성하고 인포윈도우에 마커를 기반한 위도와 경도 해당하는 길찾기 및 큰 지도보기 기능 사용하기
+
+```javascript
+import React from 'react';
+import { Map, MapMarker } from "react-kakao-maps-sdk";
+
+const MarkerWithInfoWindow = () => {
+   return (
+      <>
+         <Map // 지도를 표시할 Container
+         center={{
+         // 지도의 중심좌표
+         lat: 33.450701,
+         lng: 126.570667,
+         }}
+         style={{
+         // 지도의 크기
+         width: "100%",
+         height: "450px",
+         }}
+         level={3} // 지도의 확대 레벨
+      >
+         <MapMarker // 인포윈도우를 생성하고 지도에 표시합니다
+         position={{
+            // 인포윈도우가 표시될 위치입니다
+            lat: 33.450701,
+            lng: 126.570667,
+         }}
+         >
+         {/* MapMarker의 자식을 넣어줌으로 해당 자식이 InfoWindow로 만들어지게 합니다 */}
+         {/* 인포윈도우에 표출될 내용으로 HTML 문자열이나 React Component가 가능합니다 */}
+         <div style={{ padding: "5px", color: "#000" }}>
+            Hello World! <br />
+            <a
+               href="https://map.kakao.com/link/map/Hello World!,33.450701,126.570667"
+               style={{ color: "blue" }}
+               target="_blank"
+               rel="noreferrer"
+            >
+               큰지도보기
+            </a>{" "}
+            <a
+               href="https://map.kakao.com/link/to/Hello World!,33.450701,126.570667"
+               style={{ color: "blue" }}
+               target="_blank"
+               rel="noreferrer"
+            >
+               길찾기
+            </a>
+         </div>
+         </MapMarker>
+      </Map>
+      <h2>원하는 마커에 인포윈도우 생성 및 큰 지도보기, 길찾기</h2>
+      <p2>각각은 이동하는 링크에 이름을 지정할 수 있음</p2>
+      </>
+   )
+}
+
+
+export default MarkerWithInfoWindow;
+
+```
+
+`MapMarker` 컴포넌트 내부에 `div` 또는 `React Component`를 삽입하여 마커에 인포윈도우를 생성할 수 있다. 
+
+```javascript
+<a
+    href="https://map.kakao.com/link/to/Hello World!,33.450701,126.570667"
+    style={{ color: "blue" }}
+    target="_blank"
+    rel="noreferrer"
+>
+    길찾기
+</a>
+```
+
+`a` 태그의 경로를 보면 `Hello World` 를 볼 수 있는데 이는 길찾기 기능이나 큰 지도로 볼 때 해당위치의 라벨이다. 뒤에는 위치 정보를 담는다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## ~~`App.js` 전체 코드 (이거는 depreciated)~~
 ```jsx
