@@ -9,7 +9,8 @@ const CNav = () => {
      'enableDisableZoomInOut', 'addTrafficOverlay', 
      'addLoadViewOverlay', 'addTerrainOverlay', 
      'changeOverlay1', 'changeOverlay2', 'setBounds', 'addTilesloadedEvent',
-      'draggerableMarker', 'markerImage', 'infoWindow', 'markerWithInfoWindow'
+      'draggerableMarker', 'markerImage', 'infoWindow', 'markerWithInfoWindow','addMarkerClickEvent',
+      'addDraggerableMarker', 'gelocationMarker', 'multipleMarkerControl'
    ];
  
    return (

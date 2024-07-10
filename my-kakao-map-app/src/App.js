@@ -22,6 +22,10 @@ import DraggerableMarker from './component/DraggerableMarker';
 import MarkerImage from './component/MarkerImage';
 import InfoWindow from './component/InfoWindow';
 import MarkerWithInfoWindow from './component/MarkerWithInfoWindow';
+import AddMarkerClickEvent from './component/AddMarkerClickEventAndMouseOver';
+import AddDraggerableMarker from './component/AddDraggerableMarker';
+import GelocationMarker from './component/gelocationMarker';
+import MultipleMarkerControl from './component/MultipeMarkerControl';
 
 
 const App = () => {
@@ -50,6 +54,10 @@ const App = () => {
           <Route path='/markerImage' element={<MarkerImage></MarkerImage>}></Route>
           <Route path='/infoWindow' element={<InfoWindow></InfoWindow>}></Route>
           <Route path='/markerWithInfoWindow' element={<MarkerWithInfoWindow></MarkerWithInfoWindow>}></Route>
+          <Route path='/addMarkerClickEvent' element={<AddMarkerClickEvent></AddMarkerClickEvent>}></Route>
+          <Route path='/addDraggerableMarker' element={<AddDraggerableMarker></AddDraggerableMarker>}></Route>
+          <Route path='/gelocationMarker' element={<GelocationMarker></GelocationMarker>}></Route>
+          <Route path='/multipleMarkerControl' element={<MultipleMarkerControl></MultipleMarkerControl>}></Route>
 
         </Route>
         {/* <Route path="/addMapCustomControl" element={<AddMapCustomControl></AddMapCustomControl>}></Route> */}
