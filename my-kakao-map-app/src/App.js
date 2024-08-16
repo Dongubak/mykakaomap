@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Map1 from './component/Map1';
+// import Map1 from './component/Map1';
+import Map1 from './components/Sample'
 import Map2 from './component/Map2';
 import BasicMap from './component/BasicMap';
 import MoveMap from './component/MoveMap';
@@ -26,13 +27,23 @@ import AddMarkerClickEvent from './component/AddMarkerClickEventAndMouseOver';
 import AddDraggerableMarker from './component/AddDraggerableMarker';
 import GelocationMarker from './component/gelocationMarker';
 import MultipleMarkerControl from './component/MultipeMarkerControl';
+import Sample from './components/Sample';
+import InputKeywords from './components/InputKeywords';
 
 
 const App = () => {
-  
+  const [keyword, setKeyword] = useState('');
+
+  const onChange = useCallback((e) => {
+    setKeyword(e.target.value);
+  }, [keyword]);
+
+  const onClick = useCallback(() => {
+    setKeyword('');
+  }, [keyword])
   return (
     <>
-      <Routes>
+      {/* <Routes>
         <Route path='/' element={<CNav></CNav>}>
           <Route path='/map1' element={<Map1></Map1>}></Route>
           <Route path='/map2' element={<Map2></Map2>}></Route>
@@ -60,8 +71,9 @@ const App = () => {
           <Route path='/multipleMarkerControl' element={<MultipleMarkerControl></MultipleMarkerControl>}></Route>
 
         </Route>
-        {/* <Route path="/addMapCustomControl" element={<AddMapCustomControl></AddMapCustomControl>}></Route> */}
-      </Routes>
+      </Routes> */}
+      <Sample keyword={keyword}></Sample>
+      <InputKeywords keyword={keyword} onChange={onChange} onClick={onClick}></InputKeywords>
     </>
     
   )
